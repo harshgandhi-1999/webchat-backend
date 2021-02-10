@@ -1,12 +1,13 @@
 require("dotenv").config();
 const http = require("http");
 const express = require("express");
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const cors = require("cors");
 
 //creating instance of express
 const app = express();
-
 //creating server
 const server = http.createServer(app);
 const io = require("socket.io")(server, {
@@ -15,14 +16,36 @@ const io = require("socket.io")(server, {
   },
 });
 
+//IMPORT ROUTES
+const authRoutes = require("./routes/auth");
+
+// DATABASE CONNECTION
+mongoose
+  .connect(process.env.MONGODBURL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+  })
+  .then(() => {
+    console.log("DB connected");
+  })
+  .catch((err) => {
+    console.log("error in db connection");
+    console.log(err);
+  });
+
 //middlewares
 app.use(morgan("dev"));
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 app.use(
   cors({
     origin: "http://localhost:3000",
     methods: ["GET", "POST"],
   })
 );
+app.use(express.json());
+app.disable("x-powered-by");
 
 let users = new Map();
 
@@ -54,6 +77,12 @@ io.on("connection", (socket) => {
     users.delete(contactNo);
     console.log("client disconnected");
   });
+});
+
+//ROUTES
+app.use("/api", authRoutes);
+app.get("/", (req, res) => {
+  res.send("App is running");
 });
 
 const PORT = process.env.PORT;
