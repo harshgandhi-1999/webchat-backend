@@ -26,12 +26,12 @@ exports.login = async (req, res) => {
         });
       } else {
         res.status(401).json({
-          message: "Incorect contact no. or password",
+          message: "Incorrect contact no. or password",
         });
       }
     } else {
       res.status(404).json({
-        message: "Incorect contact no. or password",
+        message: "Incorrect contact no. or password",
       });
     }
   } catch (err) {

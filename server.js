@@ -52,8 +52,7 @@ let users = new Map();
 //socket io connection
 io.on("connection", (socket) => {
   console.log("socket connected");
-  const { contactNo, name } = socket.handshake.query;
-  // socket.join(contactNo);
+  const { contactNo, username } = socket.handshake.query;
   users.set(contactNo, socket.id);
 
   //listen to event send message
@@ -61,8 +60,8 @@ io.on("connection", (socket) => {
   socket.on("send-message", (messageBody) => {
     const newMesage = {
       ...messageBody,
-      recipient: { recipientNo: contactNo, recipientName: name },
-      sender: { contactNo: contactNo, name: name },
+      recipient: { recipientNo: contactNo },
+      sender: { contactNo: contactNo },
     };
 
     io.to(users.get(messageBody.recipient.recipientNo)).emit(
