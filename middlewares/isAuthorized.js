@@ -14,7 +14,6 @@ const isAuthorized = async (req, res, next) => {
       });
     }
   } catch (e) {
-    console.log(e);
     //if an error occured return request unauthorized error
     return res.status(401).json({
       message: "Unauthorized user",

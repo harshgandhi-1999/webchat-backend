@@ -35,7 +35,6 @@ exports.login = async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(err);
     res.status(500).json({
       message: "Internal server error",
     });
@@ -57,7 +56,6 @@ exports.signup = async (req, res) => {
       message: "Signup Successfull",
     });
   } catch (err) {
-    console.log(err);
     res.status(500).json({
       message: "Internal server error",
     });
