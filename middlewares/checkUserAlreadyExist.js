@@ -9,7 +9,7 @@ const checkUserAlreadyExist = async (req, res, next) => {
       .exec();
     if (user) {
       return res.status(422).json({
-        message: "User already exist",
+        message: "User already exist with this username or contact.",
       });
     }
     next();
