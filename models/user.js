@@ -1,5 +1,10 @@
 const mongoose = require("mongoose");
 
+const contactSchema = new mongoose.Schema({
+  contactNo: String,
+  name: String,
+});
+
 const userSchema = new mongoose.Schema(
   {
     username: {
@@ -19,6 +24,9 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
+    },
+    contactList: {
+      type: [contactSchema],
     },
   },
   { timestamps: true }

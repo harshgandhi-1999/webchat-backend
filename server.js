@@ -18,6 +18,7 @@ const io = require("socket.io")(server, {
 
 //IMPORT ROUTES
 const authRoutes = require("./routes/auth");
+const userRoutes = require("./routes/user");
 
 // DATABASE CONNECTION
 mongoose
@@ -41,7 +42,7 @@ app.use(bodyParser.json());
 app.use(
   cors({
     origin: "http://localhost:3000",
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "OPTIONS", "PUT", "DELETE"],
   })
 );
 app.use(express.json());
@@ -80,6 +81,7 @@ io.on("connection", (socket) => {
 
 //ROUTES
 app.use("/api", authRoutes);
+app.use("/api", userRoutes);
 app.get("/", (req, res) => {
   res.send("App is running");
 });

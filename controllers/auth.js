@@ -4,14 +4,14 @@ const jwt = require("jsonwebtoken");
 
 const options = {
   algorithm: "HS256",
-  expiresIn: "1d",
+  expiresIn: "1h",
 };
 exports.login = async (req, res) => {
   const { contact, password } = req.body;
   try {
     const foundUser = await User.findOne({ contact: contact }).exec();
     if (foundUser) {
-      const payload = { contact: foundUser.contact };
+      const payload = { contact: foundUser.contact, userId: foundUser._id };
       const result = await bcrypt.compare(password, foundUser.password);
       if (result) {
         const accessToken = jwt.sign(payload, process.env.JWT_SECRET, options);
