@@ -53,8 +53,9 @@ mongoose
 app.use(morgan("dev"));
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "*",
     methods: ["GET", "POST", "OPTIONS", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Accept", "Authorization"],
   })
 );
 app.use(express.json());
