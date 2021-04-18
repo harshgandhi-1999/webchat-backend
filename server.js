@@ -2,9 +2,9 @@ require("dotenv").config();
 const http = require("http");
 const express = require("express");
 const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const cors = require("cors");
+const Conversation = require("./models/conversation");
 
 //creating instance of express
 const app = express();
@@ -19,10 +19,11 @@ const io = require("socket.io")(server, {
 //IMPORT ROUTES
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
+const conversationRoutes = require("./routes/conversation");
 
 // DATABASE CONNECTION
 mongoose
-  .connect(process.env.MONGODBURL, {
+  .connect(process.env.MONGODBPROD, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
@@ -35,10 +36,21 @@ mongoose
     console.log(err);
   });
 
+// const db = mongoose.connection;
+
+// db.once("open", () => {
+//   const convoCollection = db.collection("conversations");
+//   const changeStream = convoCollection.watch();
+
+//   changeStream.on("change", (change) => {
+//     if (change.operationType === "insert") {
+//       io.emit("sended", "sdsdjknsd");
+//     }
+//   });
+// });
+
 //middlewares
 app.use(morgan("dev"));
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
 app.use(
   cors({
     origin: "http://localhost:3000",
@@ -58,17 +70,24 @@ io.on("connection", (socket) => {
 
   //listen to event send message
   //when a client sends a message
-  socket.on("send-message", (messageBody) => {
+  socket.on("send-message", async (messageBody) => {
+    console.log(messageBody);
+    const { message, recipient } = messageBody;
     const newMesage = {
       ...messageBody,
       recipient: { recipientNo: contactNo },
       sender: { contactNo: contactNo },
     };
 
-    io.to(users.get(messageBody.recipient.recipientNo)).emit(
-      "recieve-message",
-      newMesage
-    );
+    const newConvo = new Conversation({
+      sender: contactNo,
+      recipient: recipient.recipientNo,
+      message: message,
+    });
+
+    await newConvo.save();
+
+    io.to(users.get(recipient.recipientNo)).emit("recieve-message", newMesage);
   });
 
   //server sends to client
@@ -82,8 +101,25 @@ io.on("connection", (socket) => {
 //ROUTES
 app.use("/api", authRoutes);
 app.use("/api", userRoutes);
+app.use("/api", conversationRoutes);
 app.get("/", (req, res) => {
   res.send("App is running");
+});
+
+app.use((req, res, next) => {
+  const error = new Error("Not Found");
+  error.status = 404;
+  next(error);
+});
+
+app.use((err, req, res, next) => {
+  console.log(err);
+  res.status(err.status || 500).json({
+    error: {
+      status: err.status,
+      message: err.message,
+    },
+  });
 });
 
 const PORT = process.env.PORT;
