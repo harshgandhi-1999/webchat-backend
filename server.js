@@ -67,15 +67,14 @@ let users = new Map();
 
 //socket io connection
 io.on("connection", (socket) => {
-  console.log("socket connected");
+  console.log("client connected");
   const { contactNo, username } = socket.handshake.query;
   users.set(contactNo, socket.id);
 
   //listen to event send message
   //when a client sends a message
   socket.on("send-message", async (messageBody) => {
-    console.log(messageBody);
-    const { message, recipient } = messageBody;
+    const { message, recipient, date, time } = messageBody;
     const newMesage = {
       ...messageBody,
       recipient: { recipientNo: contactNo },
@@ -85,7 +84,9 @@ io.on("connection", (socket) => {
     const newConvo = new Conversation({
       sender: contactNo,
       recipient: recipient.recipientNo,
-      message: message,
+      date,
+      time,
+      message,
     });
 
     await newConvo.save();

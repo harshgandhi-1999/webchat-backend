@@ -10,12 +10,11 @@ const conversationSchema = new mongoose.Schema({
   message: {
     type: String,
   },
-  timestamp: {
+  date: {
     type: String,
   },
-  date: {
-    type: Date,
-    default: Date.now,
+  time: {
+    type: String,
   },
 });
 
