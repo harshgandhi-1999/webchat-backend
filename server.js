@@ -29,6 +29,7 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
+    useFindAndModify: false,
   })
   .then(() => {
     console.log("DB connected");
@@ -87,6 +88,7 @@ io.on("connection", (socket) => {
       date,
       time,
       message,
+      participants: [contactNo, recipient.recipientNo],
     });
 
     await newConvo.save();

@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
-const contactSchema = new mongoose.Schema({
+const contactListSchema = new mongoose.Schema({
+  contactNo: String,
+  name: String,
+});
+const convoListSchema = new mongoose.Schema({
   contactNo: String,
   name: String,
 });
@@ -26,7 +30,11 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     contactList: {
-      type: [contactSchema],
+      type: [contactListSchema],
+    },
+    conversationList: {
+      type: [convoListSchema],
+      default: [],
     },
   },
   { timestamps: true }

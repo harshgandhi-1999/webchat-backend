@@ -1,22 +1,28 @@
 const mongoose = require("mongoose");
 
-const conversationSchema = new mongoose.Schema({
-  sender: {
-    type: String,
+const conversationSchema = new mongoose.Schema(
+  {
+    sender: {
+      type: String,
+    },
+    recipient: {
+      type: String,
+    },
+    message: {
+      type: String,
+    },
+    date: {
+      type: String,
+    },
+    time: {
+      type: String,
+    },
+    participants: [String],
   },
-  recipient: {
-    type: String,
-  },
-  message: {
-    type: String,
-  },
-  date: {
-    type: String,
-  },
-  time: {
-    type: String,
-  },
-});
+  {
+    timestamps: true,
+  }
+);
 
 // const conversations = new mongoose.Schema({
 //   messages: [messageSchema],

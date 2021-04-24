@@ -2,7 +2,11 @@ const express = require("express");
 const router = express.Router();
 const { check } = require("express-validator");
 
-const { addContact, getAllContacts } = require("../controllers/user");
+const {
+  addContact,
+  getAllContacts,
+  getChatList,
+} = require("../controllers/user");
 const checkErrors = require("../middlewares/checkErrors");
 const isAuthorized = require("../middlewares/isAuthorized");
 
@@ -20,5 +24,7 @@ router.post(
   addContact
 );
 router.get("/allContacts/:userId", isAuthorized, getAllContacts);
+
+router.get("/chatlist/:userId", isAuthorized, getChatList);
 
 module.exports = router;
