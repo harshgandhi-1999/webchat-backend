@@ -37,11 +37,15 @@ exports.getConvo = async (req, res) => {
       });
     }
 
+    //fetching all messages with users in array participants
     const allMessages = await Conversation.find({
-      participants: { $in: participants },
+      $and: [
+        { participants: { $all: participants } },
+        { participants: { $size: participants.length } },
+      ],
     })
       .select("sender recipient date time message")
-      .sort({ updatedAt: -1 })
+      .sort({ updatedAt: 1 }) //asc order
       .exec();
 
     res.status(200).json({
