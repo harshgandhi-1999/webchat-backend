@@ -1,18 +1,20 @@
 const Conversation = require("../models/conversation");
+const User = require("../models/user");
 
-exports.createConvo = async (req, res) => {
-  const { sender, recipient, message } = req.body;
-  const newConvo = new Conversation({
-    sender,
-    recipient,
-    message,
-  });
-
+exports.createNewConvo = async (req, res) => {
+  const userId = req.params.userId;
+  const { contactNo, name } = req.body;
   try {
-    await newConvo.save();
+    const user = await User.findByIdAndUpdate(
+      userId,
+      {
+        $push: { conversationList: { contactNo: contactNo, name: name } },
+      },
+      { upsert: true, new: true }
+    ).select("conversationList");
+
     res.status(200).json({
-      message: "OK",
-      convo: newConvo,
+      user: user,
     });
   } catch (err) {
     console.log(err);
@@ -23,14 +25,24 @@ exports.createConvo = async (req, res) => {
 };
 
 exports.getConvo = async (req, res) => {
-  const { sender, recipient } = req.body;
+  const participants = req.query.participants;
   try {
+    if (
+      participants === undefined ||
+      participants === null ||
+      participants.length < 2
+    ) {
+      return res.status(400).json({
+        message: "Invalid query",
+      });
+    }
+
     const allMessages = await Conversation.find({
-      $or: [
-        { sender: sender, recipient: recipient },
-        { sender: recipient, recipient: sender },
-      ],
-    }).exec();
+      participants: { $in: participants },
+    })
+      .select("sender recipient date time message")
+      .sort({ updatedAt: -1 })
+      .exec();
 
     res.status(200).json({
       message: "fetched",

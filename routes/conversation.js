@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 
-const { createConvo, getConvo } = require("../controllers/conversation");
+const { getConvo, createNewConvo } = require("../controllers/conversation");
+const isAuthorized = require("../middlewares/isAuthorized");
 
-router.post("/createconvo", createConvo);
+router.post("/createnew/:userId", isAuthorized, createNewConvo);
 
-router.get("/getConvo", getConvo);
+router.get("/getconvo/:userId/", isAuthorized, getConvo);
 
 module.exports = router;
