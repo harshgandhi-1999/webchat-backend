@@ -11,7 +11,7 @@ const checkErrors = require("../middlewares/checkErrors");
 const isAuthorized = require("../middlewares/isAuthorized");
 
 router.post(
-  "/addContact/:userId",
+  "/contact/add/:userId",
   [
     check("contactNo", "Contact no. should be of 10 digits").matches(
       /^[6-9][0-9]{9}/,
@@ -23,7 +23,7 @@ router.post(
   isAuthorized,
   addContact
 );
-router.get("/allContacts/:userId", isAuthorized, getAllContacts);
+router.get("/contact/all/:userId", isAuthorized, getAllContacts);
 
 router.get("/chatlist/:userId", isAuthorized, getChatList);
 
