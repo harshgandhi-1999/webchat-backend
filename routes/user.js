@@ -6,6 +6,7 @@ const {
   addContact,
   getAllContacts,
   getChatList,
+  updateChatList,
 } = require("../controllers/user");
 const checkErrors = require("../middlewares/checkErrors");
 const isAuthorized = require("../middlewares/isAuthorized");
@@ -26,5 +27,7 @@ router.post(
 router.get("/contact/all/:userId", isAuthorized, getAllContacts);
 
 router.get("/chatlist/:userId", isAuthorized, getChatList);
+
+router.put("/chatlist/:userId", isAuthorized, updateChatList);
 
 module.exports = router;

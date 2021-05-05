@@ -88,3 +88,39 @@ exports.getChatList = async (req, res) => {
     });
   }
 };
+
+exports.updateChatList = async (req, res) => {
+  // update name
+  const userId = req.params.userId;
+  const { contactNo, name } = req.body;
+  try {
+    const foundUser = await User.findById(userId)
+      .select("conversationList")
+      .exec();
+    if (!foundUser) {
+      return res.status(404).json({
+        message: "Not Found",
+      });
+    }
+
+    let updatedList = await foundUser.conversationList.map((item) => {
+      if (item.contactNo === contactNo) {
+        return {
+          ...item._doc,
+          name: name,
+        };
+      }
+      return item;
+    });
+    foundUser.conversationList = updatedList;
+    await foundUser.save();
+    res.status(200).json({
+      message: "Updated",
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
