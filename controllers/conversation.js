@@ -25,12 +25,20 @@ exports.createNewConvo = async (req, res) => {
 };
 
 exports.getConvo = async (req, res) => {
+  // const reqUrl = url.format({
+  //   protocol: req.protocol,
+  //   host: req.get("host"),
+  //   pathname: req.originalUrl,
+  // });
   const participants = req.query.participants;
+  const page = parseInt(req.query.page);
+  const limit = 10;
   try {
     if (
       participants === undefined ||
       participants === null ||
-      participants.length < 2
+      participants.length < 2 ||
+      page <= 0
     ) {
       return res.status(400).json({
         message: "Invalid query",
@@ -44,12 +52,16 @@ exports.getConvo = async (req, res) => {
         { participants: { $size: participants.length } },
       ],
     })
-      .select("sender recipient date time message")
-      .sort({ updatedAt: 1 }) //asc order
+      .select("sender recipient date time message createdAt")
+      .sort({ createdAt: -1 }) //desc order
+      .limit(limit)
+      .skip((page - 1) * limit)
       .exec();
 
     res.status(200).json({
       message: "fetched",
+      previous: page <= 1 ? null : page - 1,
+      next: page >= allMessages.length ? null : page + 1,
       allMessages,
     });
   } catch (err) {
