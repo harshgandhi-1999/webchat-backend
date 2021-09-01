@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const morgan = require("morgan");
 const cors = require("cors");
 const Conversation = require("./models/conversation");
+const initSocketConnection = require("./socket/connection");
 
 //creating instance of express
 const app = express();
@@ -39,19 +40,6 @@ mongoose
     console.log(err);
   });
 
-// const db = mongoose.connection;
-
-// db.once("open", () => {
-//   const convoCollection = db.collection("conversations");
-//   const changeStream = convoCollection.watch();
-
-//   changeStream.on("change", (change) => {
-//     if (change.operationType === "insert") {
-//       io.emit("sended", "sdsdjknsd");
-//     }
-//   });
-// });
-
 //middlewares
 app.use(morgan("dev"));
 app.use(
@@ -66,43 +54,8 @@ app.disable("x-powered-by");
 
 let users = new Map();
 
-//socket io connection
-io.on("connection", (socket) => {
-  console.log("client connected");
-  const { contactNo, username } = socket.handshake.query;
-  users.set(contactNo, socket.id);
-
-  //listen to event send message
-  //when a client sends a message
-  socket.on("send-message", async (messageBody) => {
-    const { message, recipient, date, time } = messageBody;
-    const newMesage = {
-      ...messageBody,
-      recipient: { recipientNo: contactNo },
-      sender: { contactNo: contactNo },
-    };
-
-    const newConvo = new Conversation({
-      sender: contactNo,
-      recipient: recipient.recipientNo,
-      date,
-      time,
-      message,
-      participants: [contactNo, recipient.recipientNo],
-    });
-
-    await newConvo.save();
-
-    io.to(users.get(recipient.recipientNo)).emit("recieve-message", newMesage);
-  });
-
-  //server sends to client
-
-  socket.on("disconnect", () => {
-    users.delete(contactNo);
-    console.log("client disconnected");
-  });
-});
+//INITIALIZE SOCKET CONNECTION
+initSocketConnection(io);
 
 //ROUTES
 app.use("/api", authRoutes);
