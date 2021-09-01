@@ -1,3 +1,5 @@
+const Conversation = require("../../models/conversation");
+
 module.exports = (io, socket, users) => {
   socket.on("send-message", async (messageBody) => {
     const { message, recipient, date, time } = messageBody;

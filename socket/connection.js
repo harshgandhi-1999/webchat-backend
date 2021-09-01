@@ -1,5 +1,7 @@
 let users = new Map();
 
+const registerUserHandler = require("./eventHandlers/userHandler");
+
 module.exports = function (io) {
   io.on("connection", (socket) => {
     console.log("Client connected with id : ", socket.id);
