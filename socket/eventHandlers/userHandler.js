@@ -1,10 +1,12 @@
 const Conversation = require("../../models/conversation");
+const { encryptData, decryptData } = require("../../e2e/aes");
 
-module.exports = (io, socket, users) => {
+module.exports = (io, socket, users, contactNo) => {
   socket.on("send-message", async (messageBody) => {
-    const { message, recipient, date, time } = messageBody;
-    const newMesage = {
-      ...messageBody,
+    let decryptedData = decryptData(messageBody);
+    const { message, recipient, date, time } = decryptedData;
+    const newMessage = {
+      ...decryptedData,
       recipient: { recipientNo: contactNo },
       sender: { contactNo: contactNo },
     };
@@ -20,6 +22,11 @@ module.exports = (io, socket, users) => {
 
     await newConvo.save();
 
-    io.to(users.get(recipient.recipientNo)).emit("recieve-message", newMesage);
+    let encryptedData = encryptData(newMessage);
+
+    io.to(users.get(recipient.recipientNo)).emit(
+      "recieve-message",
+      encryptedData
+    );
   });
 };

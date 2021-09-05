@@ -9,7 +9,7 @@ module.exports = function (io) {
     const { contactNo, username } = socket.handshake.query;
     users.set(contactNo, socket.id);
 
-    registerUserHandler(io, socket, users);
+    registerUserHandler(io, socket, users, contactNo);
 
     socket.on("disconnect", () => {
       users.delete(contactNo);
