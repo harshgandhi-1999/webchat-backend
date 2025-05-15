@@ -26,12 +26,7 @@ const conversationRoutes = require("./routes/conversation");
 
 // DATABASE CONNECTION
 mongoose
-  .connect(process.env.MONGODBPROD, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-  })
+  .connect(process.env.MONGODBPROD)
   .then(() => {
     console.log("DB connected");
   })
