@@ -5,7 +5,6 @@ const mongoose = require("mongoose");
 const morgan = require("morgan");
 const cors = require("cors");
 const initSocketConnection = require("./socket/connection");
-const socketioJwt = require("socketio-jwt");
 
 //creating instance of express
 const app = express();
@@ -46,15 +45,6 @@ app.use(
 );
 app.use(express.json());
 app.disable("x-powered-by");
-
-//AUTHENTICATE SOCHET CONNECTION
-io.use(
-  socketioJwt.authorize({
-    secret: process.env.JWT_SECRET,
-    handshake: true,
-    auth_header_required: true,
-  })
-);
 
 //INITIALIZE SOCKET CONNECTION
 initSocketConnection(io);
