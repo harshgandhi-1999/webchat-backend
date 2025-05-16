@@ -1,38 +1,20 @@
 require("dotenv").config();
 const http = require("http");
 const express = require("express");
-const mongoose = require("mongoose");
 const morgan = require("morgan");
 const cors = require("cors");
-const initSocketConnection = require("./socket/connection");
+const connectDB = require("./database/dbConnection");
+const cacheClient = require("./cache/cacheClient");
+const initializeSocket = require("./socket");
 
 //creating instance of express
 const app = express();
-//creating server
 const server = http.createServer(app);
-const io = require("socket.io")(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST", "OPTIONS", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Accept", "Authorization"],
-  },
-});
 
 //IMPORT ROUTES
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
 const conversationRoutes = require("./routes/conversation");
-
-// DATABASE CONNECTION
-mongoose
-  .connect(process.env.MONGODBPROD)
-  .then(() => {
-    console.log("DB connected");
-  })
-  .catch((err) => {
-    console.log("error in db connection");
-    console.log(err);
-  });
 
 //middlewares
 app.use(morgan("dev"));
@@ -45,9 +27,6 @@ app.use(
 );
 app.use(express.json());
 app.disable("x-powered-by");
-
-//INITIALIZE SOCKET CONNECTION
-initSocketConnection(io);
 
 //ROUTES
 app.use("/api", authRoutes);
@@ -73,8 +52,27 @@ app.use((err, req, res, next) => {
   });
 });
 
-const PORT = process.env.PORT;
+async function startServer() {
+  try {
+    // 1. Connect to Redis
+    await cacheClient.connect();
+    console.log("✅ Redis connected");
 
-server.listen(PORT || 8000, () =>
-  console.log(`server is listening on port = ${PORT}`)
-);
+    // 2. Connect to DB
+    await connectDB();
+    console.log("✅ DB connected");
+
+    initializeSocket(server);
+    console.log("✅ WEBSOCKET INITIALIZED");
+
+    const PORT = process.env.PORT || 8000;
+    server.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error("Failed to start server:", err.message);
+    process.exit(1); // Optional: Exit with failure
+  }
+}
+
+startServer();
