@@ -11,7 +11,11 @@ exports.login = async (req, res) => {
   try {
     const foundUser = await User.findOne({ contact: contact }).exec();
     if (foundUser) {
-      const payload = { contact: foundUser.contact, userId: foundUser._id };
+      const payload = {
+        userId: foundUser._id,
+        contact: foundUser.contact,
+        username: foundUser.username,
+      };
       const result = await bcrypt.compare(password, foundUser.password);
       if (result) {
         const accessToken = jwt.sign(payload, process.env.JWT_SECRET, options);

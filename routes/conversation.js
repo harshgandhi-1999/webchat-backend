@@ -1,5 +1,4 @@
-const express = require("express");
-const router = express.Router();
+const router = require("express").Router();
 
 const { getConvo, createNewConvo } = require("../controllers/conversation");
 const isAuthorized = require("../middlewares/isAuthorized");

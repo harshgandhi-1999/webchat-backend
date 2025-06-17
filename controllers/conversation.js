@@ -30,9 +30,10 @@ exports.getConvo = async (req, res) => {
   //   host: req.get("host"),
   //   pathname: req.originalUrl,
   // });
-  const participants = req.query.participants;
+  const participants = req.query["participants[]"];
   // const page = parseInt(req.query.page);
   // const limit = 10;
+  console.log(participants);
   try {
     if (
       participants === undefined ||

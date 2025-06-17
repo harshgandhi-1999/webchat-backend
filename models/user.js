@@ -1,12 +1,8 @@
 const mongoose = require("mongoose");
 
 const contactListSchema = new mongoose.Schema({
-  contactNo: String,
-  name: String,
-});
-const convoListSchema = new mongoose.Schema({
-  contactNo: String,
-  name: String,
+  user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  aliasName: String,
 });
 
 const userSchema = new mongoose.Schema(
@@ -32,10 +28,11 @@ const userSchema = new mongoose.Schema(
     contactList: {
       type: [contactListSchema],
     },
-    conversationList: {
-      type: [convoListSchema],
-      default: [],
+    isOnline: {
+      type: Boolean,
+      default: false,
     },
+    lastSeen: Date,
   },
   { timestamps: true }
 );
