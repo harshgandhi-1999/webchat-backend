@@ -14,7 +14,7 @@ const server = http.createServer(app);
 //IMPORT ROUTES
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
-const conversationRoutes = require("./routes/conversation");
+const chatRoutes = require("./routes/chat");
 
 //middlewares
 app.use(morgan("dev"));
@@ -31,7 +31,7 @@ app.disable("x-powered-by");
 //ROUTES
 app.use("/api", authRoutes);
 app.use("/api", userRoutes);
-app.use("/api", conversationRoutes);
+app.use("/api/chat", chatRoutes);
 app.get("/", (req, res) => {
   res.send("App is running");
 });

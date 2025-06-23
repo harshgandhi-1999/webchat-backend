@@ -67,7 +67,7 @@ exports.getChatList = async (req, res) => {
       .exec();
     if (!foundUser) {
       return res.status(404).json({
-        message: "Not Found",
+        message: "User Not Found",
       });
     }
 

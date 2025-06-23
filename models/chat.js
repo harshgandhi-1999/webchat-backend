@@ -6,6 +6,7 @@ const chatSchema = new mongoose.Schema(
       type: String, // PRIVATE OR GROUP
       enum: ["PRIVATE", "GROUP"],
       required: true,
+      default: "PRIVATE",
     },
     name: String, // group name if its group
     createdBy: {
