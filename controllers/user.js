@@ -1,35 +1,40 @@
 const User = require("../models/user");
 
 exports.addContact = async (req, res) => {
-  const { contactNo, name } = req.body;
-  const userId = req.params.userId;
-  const newContact = {
-    contactNo,
-    name,
-  };
+  const { contactId, aliasName } = req.body;
+
+  const userId = req.auth.userId;
 
   try {
+    const contactToAdd = await User.findById(contactId);
+    if (!contactToAdd) {
+      return res.status(404).json({
+        message: "This contact doesn't exists",
+      });
+    }
+
     const foundUser = await User.findById(userId).select("contactList").exec();
     if (foundUser) {
-      const contactAlreadyExist = await foundUser.contactList.some(
-        (el) => el.contactNo === contactNo || el.name === name
+      const contactAlreadyExistInThisUser = foundUser.contactList.some(
+        (contact) => contact.contactId.equals(contactToAdd._id)
       );
 
-      if (contactAlreadyExist) {
-        return res.status(403).json({
-          message: "This contact already exists",
+      if (contactAlreadyExistInThisUser) {
+        return res.status(400).json({
+          message: "This user already there in your contacts",
         });
       }
 
-      await foundUser.contactList.push(newContact);
+      foundUser.contactList.push({ contactId, aliasName });
       await foundUser.save();
 
       res.status(200).json({
         message: "Contact Added",
+        contactList: foundUser.contactList,
       });
     } else {
       res.status(404).json({
-        message: "Not Found",
+        message: `User Not Found with user id: ${userId}`,
       });
     }
   } catch (err) {
@@ -40,7 +45,7 @@ exports.addContact = async (req, res) => {
 };
 
 exports.getAllContacts = async (req, res) => {
-  const userId = req.params.userId;
+  const userId = req.auth.userId;
   try {
     const foundUser = await User.findById(userId).select("contactList").exec();
     if (foundUser) {
@@ -49,7 +54,7 @@ exports.getAllContacts = async (req, res) => {
       });
     } else {
       res.status(404).json({
-        message: "Not Found",
+        message: `User Not Found with user id: ${userId}`,
       });
     }
   } catch (err) {
