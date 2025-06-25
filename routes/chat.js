@@ -1,10 +1,50 @@
 const router = require("express").Router();
+const { body, param } = require("express-validator");
 
-const { createNewChat, getChatById } = require("../controllers/chat");
+const {
+  createNewChat,
+  getChatById,
+  createGroupChat,
+} = require("../controllers/chat");
 const isAuthorized = require("../middlewares/isAuthorized");
+const checkErrors = require("../middlewares/checkErrors");
 
-router.post("/create/", isAuthorized, createNewChat);
+router.post(
+  "/create/",
+  [
+    body("participantId")
+      .isMongoId()
+      .withMessage("Field error: Invalid participantId"),
+  ],
+  checkErrors,
+  isAuthorized,
+  createNewChat
+);
 
-router.get("/:chatId", isAuthorized, getChatById);
+router.get(
+  "/:chatId",
+  [
+    param("chatId")
+      .isMongoId()
+      .withMessage("Field error: Invalid participantId"),
+  ],
+  checkErrors,
+  isAuthorized,
+  getChatById
+);
+
+router.post(
+  "/create/group",
+  [
+    body("groupName", "Required field: groupName").trim().isLength({ min: 1 }),
+    body("participants", "Required field: participants").isArray({ min: 1 }),
+    body("participants.*") // This applies to each item in the array
+      .isMongoId()
+      .withMessage("Field error: Invalid participant id in participants"),
+  ],
+  checkErrors,
+  isAuthorized,
+  createGroupChat
+);
 
 module.exports = router;
