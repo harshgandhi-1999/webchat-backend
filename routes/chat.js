@@ -5,6 +5,7 @@ const {
   createNewChat,
   getChatById,
   createGroupChat,
+  getChatList,
 } = require("../controllers/chat");
 const isAuthorized = require("../middlewares/isAuthorized");
 const checkErrors = require("../middlewares/checkErrors");
@@ -22,7 +23,7 @@ router.post(
 );
 
 router.get(
-  "/:chatId",
+  "/info/:chatId",
   [
     param("chatId")
       .isMongoId()
@@ -46,5 +47,7 @@ router.post(
   isAuthorized,
   createGroupChat
 );
+
+router.get("/all", isAuthorized, getChatList);
 
 module.exports = router;

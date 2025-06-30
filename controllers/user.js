@@ -64,36 +64,7 @@ exports.getAllContacts = async (req, res) => {
   }
 };
 
-exports.getChatList = async (req, res) => {
-  const userId = req.params.userId;
-  try {
-    const foundUser = await User.findById(userId)
-      .select("conversationList")
-      .exec();
-    if (!foundUser) {
-      return res.status(404).json({
-        message: "User Not Found",
-      });
-    }
-
-    const formattedList = await foundUser.conversationList.map((item) => {
-      return {
-        recipient: { recipientName: item.name, recipientNo: item.contactNo },
-        messages: [],
-      };
-    });
-
-    res.status(200).json({
-      chatList: formattedList,
-    });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({
-      message: "Internal server error",
-    });
-  }
-};
-
+//TODO: Remove or update this below function
 exports.updateChatList = async (req, res) => {
   // update name
   const userId = req.params.userId;
