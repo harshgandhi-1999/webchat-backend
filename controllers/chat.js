@@ -108,3 +108,21 @@ exports.createGroupChat = async (req, res) => {
     });
   }
 };
+
+exports.getChatList = async (req, res) => {
+  const userId = req.auth.userId;
+  try {
+    const userChats = await Chat.find({
+      participants: userId, // or: { $in: [userId] }
+    }).populate("participants", "username contact");
+
+    res.status(200).json({
+      chatList: userChats,
+    });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
